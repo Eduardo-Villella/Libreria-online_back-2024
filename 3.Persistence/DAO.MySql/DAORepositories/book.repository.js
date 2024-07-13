@@ -2,10 +2,13 @@ const BaseRepository = require('./base.repository');
 
 class BookRepository extends BaseRepository { //Se crea una clase para book que extiende de BaseRepository
     constructor(){
-        super('libros', 'id_libros');// Pasa 'id_libros' como campo de identificacion; // Atencion como se debe llamar con las comillas separadas: 'unArgumento', 'otroArgumento'// Al inicializar BaseRepository con el nombre de la tabla 'libros', todas las operaciones definidas en BaseRepository se aplican a la tabla
+        super('libros', 'id_libros');// Pasa 'id_libros' como campo de identificacion; // Atencion como se debe llamar con las comillas separadas: 'unArgumento', 'otroArgumento'
+        // Al inicializar BaseRepository con el nombre de la tabla 'libros', todas las operaciones definidas en BaseRepository se aplican a la tabla
     }
 
-    async getAll() {
+     /* -------------------------- Metodos específicos para BookRepository ------------------ */
+
+    /*async getAll() {
         const sql = `SELECT libros.*, categoria.nombre_cat as categoria FROM ${this.tableName} LEFT JOIN categoria ON categoria.id_categoria = libros.categoria_id`;
         return await this.query(sql);
     }
@@ -13,7 +16,7 @@ class BookRepository extends BaseRepository { //Se crea una clase para book que 
     async findById(id) {
         const sql = `SELECT libros.*, categoria.nombre_cat as categoria FROM ${this.tableName} LEFT JOIN categoria ON categoria.id_categoria = libros.categoria_id WHERE libros.id_libros = ?`;
         return await this.query(sql, [id]);
-    }
+    }*/
 
     //borra todo para abajo -------------------- borrar
     /*async delete(id){

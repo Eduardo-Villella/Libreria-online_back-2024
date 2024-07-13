@@ -4,8 +4,6 @@ class BaseRepository{ // Creamos clase general para realizar metodos CRUD
     constructor(tableName, idField = 'id') { // Agrega un parámetro idField para indicar el id de cada tabla
         this.tableName = tableName;// Nombre de la tabla elegida en base de datos
         this.idField = idField; // Campo de identificacion en la tabla
-        //this.fields = null;// Inicializamos campos a null // borrar
-        //this.values = null;// Inicializamos valores a null // borrar
         this.dataBaseServer = new DataBaseServer(); // Instanciamos de DataBaseServer
     }
 
@@ -33,12 +31,37 @@ class BaseRepository{ // Creamos clase general para realizar metodos CRUD
         return await this.query(sql);// Retorna la ejecucion de la consulta y resultado
     }
 
+    async findByCriteria(criteria, joins = []) {// Para busquedas abiertas de varios criterios cruzados y cruce de tablas
+        let sql = `SELECT ${this.tableName}.*, ${joins.map(join => `${join.table}.${join.alias}`).join(', ')} FROM ${this.tableName}`;
+    
+        for (const join of joins) {// Agrega las combinaciones JOIN de tablas
+            sql += ` ${join.type} JOIN ${join.table} ON ${join.on}`;
+        }
+
+        sql += ' WHERE 1=1';// Where 1=1 es comun su uso para facilitar la adicion dinamica de criterios (campos o tablas) usando AND
+        const params = [];
+    
+        for (const [key, value] of Object.entries(criteria)) {// Usando Objet.entries itera sobre cada par clave-valor de los criterios ingresados formando un array [key, value]
+            if (value) {
+                if (typeof value === 'object' && value.operator && value.value) {// Aqui busca y permite operadores de comparacion
+                    sql += ` AND ${key} ${value.operator} ?`;
+                    params.push(value.value);// Agrega el valor al array
+                } else {
+                    sql += ` AND ${key} = ?`;
+                    params.push(value);// Agrega el valor al array
+                }
+            }
+        }
+        return await this.query(sql, params);
+    }
+
     // Metodos de manipulacion de datos
 
     async extractData(entityObject){ 
         this.fields = Object.keys(entityObject);
         this.values = Object.values(entityObject);
-        /* Este metodo: extractData(entitytObject) extrae, interpreta y transforma los datos entre js y sql. Asigna a this.fields un array con los nombres de campos, por ejemplo (['id', 'nombre', 'apellido',etc]); y, a this.values un array de los valores correspondientes ([1, 'Eduardo', 'ElBonito', etc]). Permitiendo luego formar el par: clave=valor
+        /* Este metodo: extractData(entitytObject) extrae, interpreta y transforma los datos entre js y sql. Asigna a this.fields un array con los nombres de campos,
+         por ejemplo (['id', 'nombre', 'apellido',etc]); y, a this.values un array de los valores correspondientes ([1, 'Eduardo', 'ElBonito', etc]). Permitiendo luego formar el par: clave=valor
         Al igual que todos los metodos, al ser asincrono no importa en que orden de lugar este declarado dentro de la clase.
         Prefiero ponerlo aqui y no al final ya que sera usado por los dos proximos metodos: add y update, asi es mas facil su visualizacion y entendimiento */
     }
@@ -68,6 +91,7 @@ class BaseRepository{ // Creamos clase general para realizar metodos CRUD
         const sql = `DELETE FROM ${this.tableName} WHERE ${this.idField} = ?`;
         return await this.query(sql, [id]);
     }
+
 
 }
 
