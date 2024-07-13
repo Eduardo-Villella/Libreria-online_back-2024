@@ -3,7 +3,7 @@
 mergeo todas las actualizaciones y subo rama mergeAll
 
 - Actualizo: domingo 30 de junio 2024 - 16:00
-Creo archivo front.static.routes.js para atender la solicitudes GET del frontend y servir las paginas estaticas y la onfiguracion de las vasiables de entorno en GET/config
+Creo archivo front.static.routes.js para atender la solicitudes GET del frontend y servir las paginas estaticas y la onfiguracion de las variables de entorno en GET/config
 Se modifican los archivos front.server.js y rest.server.js para corregir las rutas usuarios
 Se corrigen los archivos base.repository.js y user.repository.js para que el registro de nuevos usuarios se limite a pedir 3 campos: usuario, email y contraseña
 Se modifica validator.js por el mismo motivo
