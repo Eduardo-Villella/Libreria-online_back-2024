@@ -16,6 +16,7 @@ class DataBaseServer {
             queueLimit: 0
         }).promise();
     }
+    
     //Creamos, si no existe, o confirmamos la base de datos
     async dbReady() {
         const dbConnection = await mysql.createConnection({
@@ -36,6 +37,7 @@ class DataBaseServer {
             await dbConnection.end();
         }
     }
+
     //inicializamos y guardamos estos datos que seran llamados al momento de Instanciar la clase
     dbConnection() {
         return this.pool;
@@ -53,24 +55,4 @@ class DataBaseServer {
 
 
 module.exports = DataBaseServer;
-
-
-
-/* ---------------- Anteriormente Con Funciones --------------------------------- */
-/*const mysql = require('mysql2');
-require('dotenv').config();
-
-const pool = mysql.createPool({
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0
-});
-
-
-module.exports = pool.promise();*/
 

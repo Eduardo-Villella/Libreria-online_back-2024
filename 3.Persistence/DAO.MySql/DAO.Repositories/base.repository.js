@@ -1,4 +1,4 @@
-const DataBaseServer = require('../db.config');// Importamos la configuracion de la conexion a la base
+const DataBaseServer = require('../../db.config');// Importamos la configuracion de la conexion a la base
 
 class BaseRepository{ // Creamos clase general para realizar metodos CRUD
     constructor(tableName, idField = 'id') { // Agrega un parámetro idField para indicar el id de cada tabla
@@ -91,7 +91,6 @@ class BaseRepository{ // Creamos clase general para realizar metodos CRUD
         const sql = `DELETE FROM ${this.tableName} WHERE ${this.idField} = ?`;
         return await this.query(sql, [id]);
     }
-
 
 }
 

@@ -25,7 +25,6 @@ class UserRepository extends BaseRepository { //Se crea una clase para user que 
         return users.length > 0 ? users[0] : null; // Devuelve el usuario si las credenciales son correctas
     }
 
-
 }
 
 

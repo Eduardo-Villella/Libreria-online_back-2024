@@ -1,4 +1,4 @@
-// Archivo para probar que el entorno permite el uso de bcrypt (escritura, lectura sin conflictos)
+// Archivo script para probar que el entorno permite el uso de bcrypt (escritura, lectura sin conflictos)
 
 const bcrypt = require('bcrypt');
 
@@ -16,6 +16,7 @@ async function testBcrypt() {
     } catch (error) {
         console.error('Error with bcrypt:', error);
     }
+    
 }
 
 

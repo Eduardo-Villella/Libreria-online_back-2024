@@ -1,4 +1,6 @@
-/* En este archivo (no confundir con la biblioteca Validator.js) usaremos joi, biblioteca de validacion que permite definir esquemas usando la estructura de los campos de las tablas de la base de datos y luego validarlos contra objetos recibidos. Se usa principalmente en controllers y/o models asegurando asi que los datos recibidos sean validados antes de llegar a la capa de repositories */
+/* En este archivo (no confundir con la biblioteca Validator.js) usaremos joi, biblioteca de validacion que permite definir esquemas 
+usando la estructura de los campos de las tablas de la base de datos y luego validarlos contra objetos recibidos. 
+Se usa principalmente en controllers y/o models asegurando asi que los datos recibidos sean validados antes de llegar a la capa de repositories */
 
 const Joi = require('joi');
 
@@ -83,6 +85,7 @@ class Validator {
     }
 
 }
+
 
 module.exports = new Validator();
 
