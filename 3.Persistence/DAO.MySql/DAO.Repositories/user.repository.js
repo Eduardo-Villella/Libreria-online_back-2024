@@ -14,11 +14,6 @@ class UserRepository extends BaseRepository { //Se crea una clase para user que 
         return await this.query(sql, [email]);
     }
 
-    async isEmailRegistered(email) {// Para verificar si un email ya esta registrado. Sirve de filtro al devolver true o false
-        const user = await this.findByEmail(email);
-        return user.length > 0; // Devuelve true si el email esta registrado
-    }
-
     async verifyCredentials(email, password) {// Para verificar las credenciales del usuario. Sirve de filtro al devolver true o false
         const sql = 'SELECT * FROM ${this.tableName} WHERE email = ? AND password = ?';
         const users = await this.query(sql, [email, password]);

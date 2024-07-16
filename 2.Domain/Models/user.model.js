@@ -1,58 +1,30 @@
-const { UserRepository } = require('../../3.Persistence/DAO.MySql/index');
-const validator = require('../../Utils/validator');// Agregamos para poder validar los datos que ingresaran a las tablas de la base de datos, antes de que se procese el metodo
+const bcrypt = require('bcrypt');
+
+const UserRepository = require('../../3.Persistence/DAO.MySql/DAO.Repositories/user.repository');
+const validator = require('../../1.Presentation/helpers/Utils/validator');
 
 class UserModel {
     constructor() {
         this.repository = new UserRepository();
     }
 
-    async getAll() {
-        return await this.repository.findAll();
-    }
-
     async getById(id) {
         try {
-            return await this.repository.getById(id);
-        } catch (error) {
-            throw new Error(`en model : Error obteniendo usuario por ID: ${error.message}`);
-        }
-    }
-
-    async add(userEntity) {
-        try {
-            validator.validateUser(userEntity);
-
-            const result = await this.repository.add(userEntity);
-
-            return { result };
-            
-        } catch (error) {
-            if (error.isJoi) {
-                return { error: `en model: Error de validación: ${error.message}` };// Error de validacion de datos
-            }
-            return { error: `en model: Error al agregar usuario: ${error.message}` };// Otro tipo de error, por ejemplo, de la base de datos
-        }
-    }
-
-    async update(userEntity, id) {
-        try {
-            validator.validateUser(userEntity);
-            const result = await this.repository.userUpdate(userEntity, id);
+            const result = await this.repository.findById(id);
             return result;
         } catch (error) {
-            if (error.isJoi) {
-                return { error: `en model: Error de validación: ${error.message}` }; 
-            }
-            return { error: `en model: Error al actualizar usuario: ${error.message}` };
+            console.error('en user.model: Error en getById:', error);
+            throw error;
         }
     }
 
-    async delete(id) {
+    async getAll() {
         try {
-            const result = await this.repository.delete(id);
+            const result = await this.repository.findAll();
             return result;
         } catch (error) {
-            return  error
+            console.error('en user.model: Error en getAll:', error);
+            throw error;
         }
     }
 
@@ -61,27 +33,67 @@ class UserModel {
             const result = await this.repository.findByEmail(email);
             return result;
         } catch (error) {
-            return { error: error.message };
+            console.error('en user.model: Error en findByEmail:', error);
+            throw error;
         }
     }
 
-    async isEmailRegistered(email) {
+    async criteria(criteria) {
         try {
-            const result = await this.repository.isEmailRegistered(email);
+            const result = await this.repository.findByCriteria(criteria);
             return result;
         } catch (error) {
-            return { error: error.message };
+            console.error('en user.model: Error en criteria:', error);
+            throw error;
         }
     }
 
-    async verifyCredentials(email, password) {
+    async verifyCredentials(email, password) {// Este metodo se usa desde aqui sin refactorizar en controller ya que alli se lo aplica.
         try {
-            const result = await this.repository.verifyCredentials(email, password);
-            return result;
+            const user = await this.repository.findByEmail(email);
+            if (user) {
+                const isMatch = await bcrypt.compare(password, user.password);
+                return isMatch ? user : null;
+            }
+            return null;
         } catch (error) {
-                return { error: error.message };
+            console.error('en user.model: Error en verifyCredentials:', error);
+            throw error;
         }
     }
+
+    async create(userEntity) {
+        try {
+            validator.validateUser(userEntity);
+            const result = await this.repository.add(userEntity);
+            return result;
+        } catch (error) {
+            console.error('en user.model: Error en create:', error);
+            throw error;
+        }
+    }
+
+    async update(userEntity, id) {
+        try {
+            validator.validateUser(userEntity);
+            const result = await this.repository.update(userEntity, id);
+            return result;
+        } catch (error) {
+            console.error('en user.model: Error en update:', error);
+            throw error;
+        }
+    }
+
+    async delete(id) {
+        try {
+            const result = await this.repository.delete(id);
+            return result;
+        } catch (error) {
+            console.error('en user.model: Error en delete:', error);
+            throw error;
+        }
+    }
+
 
 }
 

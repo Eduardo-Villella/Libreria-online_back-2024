@@ -31,29 +31,35 @@ class BaseRepository{ // Creamos clase general para realizar metodos CRUD
         return await this.query(sql);// Retorna la ejecucion de la consulta y resultado
     }
 
-    async findByCriteria(criteria, joins = []) {// Para busquedas abiertas de varios criterios cruzados y cruce de tablas
-        let sql = `SELECT ${this.tableName}.*, ${joins.map(join => `${join.table}.${join.alias}`).join(', ')} FROM ${this.tableName}`;
+    async findByCriteria(tableName, criteria, joins = []) {
+        let sql = `SELECT ${tableName}.*`;
     
-        for (const join of joins) {// Agrega las combinaciones JOIN de tablas
+        for (const join of joins) {
+            sql += `, ${join.table}.*`; // Selecciona todas las columnas de las tablas unidas
+        }
+    
+        sql += ` FROM ${tableName}`;
+    
+        for (const join of joins) {
             sql += ` ${join.type} JOIN ${join.table} ON ${join.on}`;
         }
-
-        sql += ' WHERE 1=1';// Where 1=1 es comun su uso para facilitar la adicion dinamica de criterios (campos o tablas) usando AND
+    
+        sql += ' WHERE 1=1';
         const params = [];
     
-        for (const [key, value] of Object.entries(criteria)) {// Usando Objet.entries itera sobre cada par clave-valor de los criterios ingresados formando un array [key, value]
+        for (const [key, value] of Object.entries(criteria)) {
             if (value) {
-                if (typeof value === 'object' && value.operator && value.value) {// Aqui busca y permite operadores de comparacion
+                if (typeof value === 'object' && value.operator && value.value) {
                     sql += ` AND ${key} ${value.operator} ?`;
-                    params.push(value.value);// Agrega el valor al array
+                    params.push(value.value);
                 } else {
                     sql += ` AND ${key} = ?`;
-                    params.push(value);// Agrega el valor al array
+                    params.push(value);
                 }
             }
         }
         return await this.query(sql, params);
-    }
+    }    
 
     // Metodos de manipulacion de datos
 

@@ -1,53 +1,79 @@
-const { BookRepository } = require('../../3.Persistence/DAO.MySql');
-
+const BookRepository = require('../../3.Persistence/DAO.MySql/DAO.Repositories/index');
+const validator = require('../../1.Presentation/helpers/Utils/validator');
 
 class BookModel {
-    constructor(){
+    constructor() {
         this.repository = new BookRepository();
     }
-    //TODO: Create a standard response object to be returned.
 
-    async getAll(){
-        return await this.repository.getAll();
-    }
+    async getById(id) {
+        try {
+            const result = await this.repository.findById(id);
+            return result;
 
-    async getById(id){
-        return await this.repository.findById(id);
-    }
-
-    async add(bookentity){
-        //TODO: Validation data and sanitizacion
-
-        try{
-            const result = await this.repository.add(bookentity);
-            return { result };
-        }catch(error){
-            return { error };
+        } catch (error) {
+            console.error('en book.model: Error en getById:', error);
+            throw error;
         }
     }
 
-    async update(bookEntity, id){
-        //TODO: Validation data and sanitizacion
-        
-        try{
+    async getAll() {
+        try {
+            const result = await this.repository.findAll();
+            return result;
+
+        } catch (error) {
+            console.error('en book.model: Error en getAll:', error);
+            throw error;
+        }
+    }
+
+    async criteria(criteria) {
+        try {
+            const result = await this.repository.findByCriteria(criteria);
+            return result;
+
+        } catch (error) {
+            console.error('en book.model: Error en criteria:', error);
+            throw error;
+        }
+    }
+
+    async create(bookEntity) {
+        try {
+            validator.validateBook(bookEntity);
+            const result = await this.repository.add(bookEntity);
+            return result;
+
+        } catch (error) {
+            console.error('en book.model: Error en create:', error);
+            throw error;
+        }
+    }
+
+    async update(bookEntity, id) {
+        try {
+            validator.validateBook(bookEntity);
             const result = await this.repository.update(bookEntity, id);
             return result;
-        }catch(error){
-            return error;
+
+        } catch (error) {
+            console.error('en book.model: Error en update:', error);
+            throw error;
         }
     }
-    
-    async delete(id){
-        //TODO: Validation data and sanitizacion
 
-        try{
+    async delete(id) {
+        try {
             const result = await this.repository.delete(id);
             return result;
-        }catch(error){
-            return error
+
+        } catch (error) {
+            console.error('en book.model: Error en delete:', error);
+            throw error;
         }
     }
-    
+
 }
 
 

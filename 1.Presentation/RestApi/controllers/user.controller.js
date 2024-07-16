@@ -1,9 +1,8 @@
 const { request, response } = require('express');
-const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
 const { UserModel } = require('../../../2.Domain/Models/index');
-const validator = require('../../../Utils/validator');
+const validator = require('../../helpers/Utils/validator');
 const { generateToken, verifyToken }  = require('../middleware/auth.JwToken');
 
 class UsersController {
@@ -11,156 +10,155 @@ class UsersController {
         this.model = new UserModel();
     }
 
-    // Query functions
+    // Query functions //
+
     async getAll(req = request, res = response) {
         try {
             const result = await this.model.getAll();
             res.json({ result });
+
         } catch (error) {
-            res.status(500).json({ error: error.message });
+            res.status(500).json({success: false, message: 'en controller, getAll: No se encontraron usuarios', error: error.message});
         }
     }
 
-/* -------------------- */
+    /* -------------------- */
 
     async getById(req = request, res = response) {
         try {
             const id = req.params.id;
-            const result = await this.model.getById(id);
-
-            if (!result) {
-                return res.status(404).json({ message: ' en controller Usuario no encontrado' });
+            if (!id || isNaN(id)) {// Valida que el ID es un numero
+                return res.status(400).json({ message: 'en controller getById: ID de usuario no válido', error: error.message });
             }
-    
+            const result = await this.model.getById(id);
+            if (!result) {
+                return res.status(404).json({ message: 'en controller getById: Usuario no encontrado', error: error.message });
+            }
             res.json({ result });
 
         } catch (error) {
             if (!res.headersSent) { // Verifica si los encabezados ya fueron enviados
-                res.status(500).json({ error: error.message });
+                res.status(500).json({mensage: 'en controller getById: No se enviaron los cabezales:', error: error.message });
             } else {
-                console.error('controller 5 . Error después de enviar la respuesta:', error);
+                res.status(500).json({mensage: 'en controller getById: Error después de enviar la respuesta:', error: error.message});
             }
         }
     }
 
-/* -------------------- */
+    /* -------------------- */
 
     async findByEmail(req = request, res = response) {
         try {
-            const email = req.params.email;
+            const { email } = req.params;
+            if (!email) {
+                return res.status(400).json({ message: 'en controller findByEmail: Email no proporcionado' });
+            }
             const result = await this.model.findByEmail(email);
+            if (!result) {
+                return res.status(404).json({ message: 'en controller findByEmail: Usuario no encontrado' });
+            }
             res.json({ result });
+
         } catch (error) {
-            res.status(500).json({ error: error.message });
+            res.status(500).json({ message: 'en controller findByEmail: Error al buscar usuario por email', error: error.message });
         }
     }
 
-/* -------------------- */
+    /* -------------------- */
 
-    async isEmailRegistered(req = request, res = response) {
+    async criteria(req = request, res = response) {
         try {
-            const email = req.params.email;
-            const result = await this.model.isEmailRegistered(email);
-            res.json({ result });
-        } catch (error) {
-            res.status(500).json({ error: error.message });
-        }
-    }
+            const criteria = req.body; // Esperamos que el frontend envie los criterios en el cuerpo de la solicitud
+            const result = await this.model.criteria(criteria);
 
-/* -------------------- */
-
-    async login(req, res) {
-        try {
-            const { email, password } = req.body;
-
-            console.log('en controller login: Contraseña recibida desde el frontend:', password);// borrar
-
-            const user = await this.model.verifyCredentials(email, password);
-            
-            if (!user) {
-                return res.status(401).json({ success: false, message: 'en controller: Usuario incorrecto' });
+            if (!result || result.length === 0) {
+                return res.status(404).json({ success: false, message: 'en controller, criteria: No se encontraron registros que coincidan con los criterios' });
             }
 
-            console.log('en controller login: Contraseña almacenada y hasheada en la base de datos:', user.password);// borrar
-      
-            //const isMatch = await bcrypt.compare(password, user.password);// Compara la contraseña proporcionada con la contraseña hasheada y almacenada
-
-            console.log('Contraseña proporcionada para comparar con bcrypt:', password);// borrar
-            console.log('Contraseña hasheada almacenada para comparar con bcrypt:', user.password);// borrar
-
-                if (!isMatch) {
-                    return res.status(401).json({ success: false, message: 'en controller: contraseña incorrecta' });
-                }
-
-                const token = generateToken({
-                    id: user.id_usuarios, 
-                    usuario: user.usuario, 
-                    email: user.email,
-                    password: user.password  
-                });
-
-                res.json({ success: true, message: 'en controller: Inicio de sesión exitoso', token });
+            res.status(200).json({ success: true, data: result });
 
         } catch (error) {
-            res.status(500).json({ success: false, message: 'en controller: Error al iniciar sesión', error: error.message });
+            console.error('en controller, criteria: Error al buscar con criterios:', error);
+            res.status(500).json({ success: false, message: 'en controller, criteria: Error en la busquedao en los criterios de busqueda' });
         }
     }
-    
-    // Commands functions
+
+    /* -------------------- *//* -------------------- *//* -------------------- *//* -------------------- */
+
+    // Commands functions //
+    // El metodo LOGIN de usuarios (Administrador y Cliente) se encuentra en el archivo login.controller.js
+
+    /* -------------------- */
 
     async createUser(req = request, res = response) {
         try {
             const { usuario, email, password } = req.body;// Extraigo solo los campos necesarios del body
                 if (!usuario || !email || !password) {// Valido que los campos requeridos esten
-                    return res.status(400).json({ error: 'Debe proporcionar nombre de usuario, email y contraseña' });
-               }
+                    return res.status(400).json({ error: 'en controller, create: Debe proporcionar nombre de usuario, email y contraseña' });
+                }    
 
-               console.log('Datos recibidos:', { usuario, email, password });// borrar
+               console.log('en controller, create: Datos recibidos:', { usuario, email, password });// borrar
 
-                const userEntity = {// Creamos un objeto con estos datos
-                    usuario,
-                    email,
-                    password
-                };
+                try {// Validamos los datos
+                    validator.validateUser({ usuario, email, password });
 
-                validator.validateUser(userEntity);// Validamos los datos
-                console.log('Datos validados correctamente');// borrar
+                } catch (error) {
+                    return res.status(400).json({ success: false, message:'en controller, create: Email, usuario o password no cumplen requisitos', error: error.message });
+                }
 
-                const hashedPassword = await bcrypt.hash(password, 10); // Hashea la contraseña
-                console.log('Contraseña hasheada:', hashedPassword);// borrar
+                console.log('en controller, create: Datos validados correctamente');// borrar
 
-                userEntity.password = hashedPassword;// Actualiza la entidad del usuario (userEntity) con la contraseña hasheada
-                console.log('Contenido de userEntity después de hashear la contraseña:', userEntity);// borrar
-
-                const result = await this.model.add(userEntity);// Agregamos el usuario utilizando el modelo
-    
-                    if (!result || !result.result || !result.result.insertId) {// Lanzamos una excepcion error si el usuario no se registra correctamente
-                        throw new Error('en copntroller: Error al tratar de registrar en base el usuario');
+                const isRegistered = await this.model.findByEmail(email);// Verificacion del Email en la Base de Datos
+                    if (isRegistered) {
+                        return res.status(404).json({ message: 'en controller, create: Email ya registrado' });
                     }
 
-                    console.log('Usuario registrado correctamente:', result);// borrar
+                    const userEntity = {// Creamos un objeto con estos datos
+                        usuario,
+                        email,
+                        password
+                    };
 
-                    res.json({ success: true, message: 'Usuario registrado exitosamente', result, userEntity });// Enviamos la respuesta de exito
-            
+                    const hashedPassword = await bcrypt.hash(password, 10); // Hashea la contraseña
+                    console.log('en controller, create: Contraseña hasheada:', hashedPassword);// borrar
 
+                    userEntity.password = hashedPassword;// Actualiza la entidad del usuario (userEntity) con la contraseña hasheada
+                    console.log('en controller, create: Contenido de userEntity después de hashear la contraseña:', userEntity);// borrar
+
+                    const result = await this.model.create(userEntity);// Agregamos el usuario utilizando el modelo
+                        if (!result || !result.result || !result.result.insertId) {// Lanzamos una excepcion error si el usuario no se registra correctamente
+                            throw new Error('en controller, create: Error al tratar de registrar en base el usuario');
+                        }
+
+                        console.log('en controller, create: Usuario registrado correctamente:', result);// borrar
+
+                        const token = generateToken({// Generamos token
+                            id: result.id_usuarios,
+                            usuario: userEntity.usuario,
+                            email: userEntity.email,
+                            rol: 'Cliente'
+                        });
+
+                        res.json({ success: true, message: 'en controller, create: Usuario registrado exitosamente', result, userEntity, token });// Enviamos la respuesta de exito
+                        
             } catch (error) {// Atrapamos errores y los personalizamos segun el caso
                     let errorMessage;
             
                     if (error.message.includes('validation')) {
-                        errorMessage = 'en controller: Error de validación de datos del usuario';
+                        errorMessage = 'en controller, create: Error de validación de datos del usuario';
 
                     } else if (error.message.includes('database')) {
-                        errorMessage = 'en controller: Error de base de datos al registrar el usuario';
+                        errorMessage = 'en controller, create: Error de base de datos al registrar el usuario';
 
                     } else {
-                        errorMessage = 'en controller: OTRO Error al registrar el nuevo usuario';
+                        errorMessage = 'en controller, create: OTRO Error al registrar el nuevo usuario';
                     }
             
                     res.status(500).json({ success: false, message: errorMessage, error: error.message});// Enviamos una respuesta de error personalizada
                 }
     }
 
-/* -------------------- */
+    /* -------------------- */
 
     async updateUser(req = request, res = response) {
         try {
@@ -168,7 +166,7 @@ class UsersController {
             const userEntity = req.body;
 
             if (!id) {
-                throw new Error("ID de usuario no definido");
+                throw new Error("en controller, update: ID de usuario no definido");
             }
 
             const updatedFields = {}; // Filtro campos undefined para no pasar datos null
@@ -184,19 +182,40 @@ class UsersController {
 
         } catch (error) {
 
-                res.status(500).json({ error: `en controller: Error al actualizar usuario: ${error.message}` });
+                res.status(500).json({ error: `en controller, update: Error al actualizar usuario: ${error.message}` });
             }
     }
     
-/* -------------------- */
+    /* -------------------- */
+
+    async softDeleteUser(req = request, res = response) {
+        try {
+            const id = req.params.id;
+    
+            if (!id) {
+                return res.status(400).json({ error: 'en controller, softDelete: ID de usuario no proporcionado' });
+            }
+    
+            const updatedFields = { status: 'inactivo' }; // Cambia el estado a 'inactivo'
+            
+            const result = await this.model.update(updatedFields, id);
+    
+            res.status(200).json({ success: true, message: 'en controller, softDelete: Usuario marcado como inactivo', result });
+        } catch (error) {
+            res.status(500).json({ error: `en controller, softDelete: Error al marcar usuario como inactivo: ${error.message}` });
+        }
+    }
+
+    /* -------------------- */
 
     async deleteUser(req = request, res = response) {
         try {
             const id = req.params.id;
             const result = await this.model.delete(id);
             res.json({ result, id });
+
         } catch (error) {
-            res.status(500).json({ error: error.message });
+            res.status(500).json({ message:'en controller, delete: ', error: error.message });
         }
     }
 
