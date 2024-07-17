@@ -1,11 +1,11 @@
-const booksController = require('./book.controller');
+const BooksController = require('./book.controller');
 const UsersController = require('./user.controller');
 const CategoryController = require('./category.controller');
 const Login = require('./login.controller');
 
 
 module.exports = {
-    booksController,
+    BooksController,
     UsersController,
     CategoryController,
     Login

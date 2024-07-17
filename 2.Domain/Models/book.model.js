@@ -1,4 +1,4 @@
-const BookRepository = require('../../3.Persistence/DAO.MySql/DAO.Repositories/index');
+const { BookRepository}  = require('../../3.Persistence/DAO.MySql/DAO.Repositories/index');
 const validator = require('../../1.Presentation/helpers/Utils/validator');
 
 class BookModel {

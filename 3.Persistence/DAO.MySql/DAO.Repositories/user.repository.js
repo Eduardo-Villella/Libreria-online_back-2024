@@ -11,7 +11,8 @@ class UserRepository extends BaseRepository { //Se crea una clase para user que 
 
     async findByEmail(email) {// Para buscar por email
         const sql = `SELECT * FROM ${this.tableName} WHERE email = ?`;
-        return await this.query(sql, [email]);
+        const results = await this.query(sql, [email]);
+        return results.length > 0 ? results[0] : null;
     }
 
     async verifyCredentials(email, password) {// Para verificar las credenciales del usuario. Sirve de filtro al devolver true o false

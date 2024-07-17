@@ -72,17 +72,17 @@ class BaseRepository{ // Creamos clase general para realizar metodos CRUD
         Prefiero ponerlo aqui y no al final ya que sera usado por los dos proximos metodos: add y update, asi es mas facil su visualizacion y entendimiento */
     }
 
-    async add(entity){// Para agregar un nuevo registro a la tabla
-        try{
-            this.extractData(entity);// Extrae los datos del objeto entity
-                const sql = `INSERT INTO ${this.tableName} (${[...this.fields]}) VALUES (${[...this.values.map(value=> `"${value}"`)]})`;// Determina la tabla, los campos y sus valores                                                            
-                //const result = await this.query(sql);// Insertar el nuevo registro // borrar
-                //return result; // borrar
-                return await this.query(sql, this.values);
-
+    async add(entity) { // Para agregar un nuevo registro a la tabla
+        try {
+            this.extractData(entity); // Extrae los datos del objeto entity
+            const sql = `INSERT INTO ${this.tableName} (${[...this.fields]}) VALUES (${[...this.values.map(value => `"${value}"`)]})`; // Determina la tabla, los campos y sus valores                                                            
+            console.log('en repository, add: Valores extraídos:', this.values); // borrar Log para los valores extraídos
+            const result = await this.query(sql, this.values); // Ejecuta la consulta con los valores extraídos
+            console.log('en repository, add: Resultado de la inserción:', result); // borrar Log para el resultado de la inserción
+            return result;
         } catch (error) {
-                console.error('en base repository add: Error al tratar de insertar en DB:', error);
-                throw error;// Re-lanza el error para que pueda ser capturado por quien lo llama
+            console.error('en base repository add: Error al tratar de insertar en DB:', error);
+            throw error; // Re-lanza el error para que pueda ser capturado por quien lo llama
         }
     }
 

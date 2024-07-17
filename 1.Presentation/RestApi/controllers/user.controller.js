@@ -110,7 +110,7 @@ class UsersController {
 
                 const isRegistered = await this.model.findByEmail(email);// Verificacion del Email en la Base de Datos
                     if (isRegistered) {
-                        return res.status(404).json({ message: 'en controller, create: Email ya registrado' });
+                        return res.json({ success: false, message: 'en controller, create: Email ya registrado' });
                     }
 
                     const userEntity = {// Creamos un objeto con estos datos
@@ -126,14 +126,15 @@ class UsersController {
                     console.log('en controller, create: Contenido de userEntity después de hashear la contraseña:', userEntity);// borrar
 
                     const result = await this.model.create(userEntity);// Agregamos el usuario utilizando el modelo
-                        if (!result || !result.result || !result.result.insertId) {// Lanzamos una excepcion error si el usuario no se registra correctamente
+                    console.log('en controller, create: Resultado de la creación:', result); //borrar
+                    if (!result || !result.insertId) {// Lanzamos una excepcion error si el usuario no se registra correctamente
                             throw new Error('en controller, create: Error al tratar de registrar en base el usuario');
                         }
 
                         console.log('en controller, create: Usuario registrado correctamente:', result);// borrar
 
                         const token = generateToken({// Generamos token
-                            id: result.id_usuarios,
+                            id: result.insertId,// Usamos result.insertId en lugar de id_usuarios porque es una respuesta de mysql al generar unnuevo id
                             usuario: userEntity.usuario,
                             email: userEntity.email,
                             rol: 'Cliente'

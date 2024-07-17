@@ -1,6 +1,6 @@
 const RestApiServer = require('./1.Presentation/RestApi/rest.server');//Importamos clases que luego se instanciaran
 const FrontServer = require('./1.Presentation/Frontend/front.server');//Importamos clases que luego se instanciaran
-const DataBaseServer = require('./3.Persistence/DAO.MySql/db.config');//Importamos una clase y la nombramos dbServer
+const DataBaseServer = require('./3.Persistence/db.config');//Importamos una clase y la nombramos dbServer
 
 
 (async()=>{

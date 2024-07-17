@@ -62,10 +62,11 @@ class UserModel {
         }
     }
 
-    async create(userEntity) {
+    async create(userEntity) {// Comprobando
         try {
             validator.validateUser(userEntity);
             const result = await this.repository.add(userEntity);
+            console.log('en model, create: Resultado de add:', result); // borrar
             return result;
         } catch (error) {
             console.error('en user.model: Error en create:', error);

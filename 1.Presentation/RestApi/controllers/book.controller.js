@@ -1,9 +1,10 @@
 const { request, response } = require('express');
+
 const { BookModel } = require('../../../2.Domain/Models/index');
 const { upload } = require('../../helpers/index');
 
 
-class booksController {
+class BooksController {
     constructor(){
         // El controlador implementa directamente el repositorio de datos
         // aunque lo ideal seria utilizarlo a traves de los diferentes casos de uso o modelos
@@ -73,5 +74,5 @@ class booksController {
 }
 
 
-module.exports = booksController;
+module.exports = BooksController;
 
