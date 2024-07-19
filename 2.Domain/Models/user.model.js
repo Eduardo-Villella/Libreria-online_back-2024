@@ -51,11 +51,12 @@ class UserModel {
     async verifyCredentials(email, password) {// Este metodo se usa desde aqui sin refactorizar en controller ya que alli se lo aplica.
         try {
             const user = await this.repository.findByEmail(email);
-            if (user) {
-                const isMatch = await bcrypt.compare(password, user.password);
-                return isMatch ? user : null;
+            if (!user) {
+                return null; // Email no encontrado
+            } else {
+                const isMatch = await bcrypt.compare(password, user.password);// Compara contraseña
+                return isMatch ? user : false; // Devuelve user si es ok o false si es contraseña incorrecta
             }
-            return null;
         } catch (error) {
             console.error('en user.model: Error en verifyCredentials:', error);
             throw error;

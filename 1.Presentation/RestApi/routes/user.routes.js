@@ -13,12 +13,10 @@ const login = new Login();
 
 /* --------------------- Rutas generales ----------------------------- */
 router.post('/register', usersController.createUser.bind(usersController));// Registro de usuario
-
+router.post('/login', login.login.bind(login));// Inicio de sesion usuario
 
 /* --------------------- Rutas Clientes ----------------------------- */
 
-//router.post('/usuario/register', usersController.createUser.bind(usersController));// Registro de usuario
-//router.post('/login', login.login.bind(login));// Inicio de sesion usuario
 //router.put('/usuario/update', verifyToken,(req, res, next) => { usersController.updateUser(req, res); })// Actualizacion de datos del usuario unicamente propios
 //router.get('/:id', usersController.getById.bind(usersController));
 /*router.get('/usuario/perfil', verifyToken, (req, res) => {// El usuario ya esta autenticado y se puede acceder a req.user.email u otros datos según sea necesario

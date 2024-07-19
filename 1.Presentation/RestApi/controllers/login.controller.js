@@ -33,21 +33,18 @@ class Login {
             if (email === 'el.administrador@soy.yo' && password === 'LosAccidentesN0existen') {
                 const token = generateToken({
                     email: email,
-                    role: 'SuperAdmin'
+                    rol: 'SuperAdmin'
                 });
-                return res.json({ success: true, message: 'en controller: Inicio de sesión como SuperAdmin exitoso', token });
+                return res.json({ success: true, message: 'en controller: Inicio de sesión como SuperAdmin exitoso', token, isAdmin: true });
             }
 
             // Verificacion del Email en la Base de Datos
-            const isRegistered = await this.model.findByEmail(email);
-            if (!isRegistered) {
-                return res.status(404).json({ message: 'en controller: Email no registrado' });
+            const user = await this.model.verifyCredentials(email, password);
+            if (user === null) {
+                return res.json({ success: false, error_code: 101, message: 'en controller: Email no registrado' });
             }
-
-            // Verificacion de Credenciales
-            const validCredentials = await this.model.verifyCredentials(email);
-            if (!validCredentials) {
-                return res.status(401).json({ success: false, message: 'en controller: Credenciales incorrectas' });
+            if (user === false) {
+                return res.json({ success: false, error_code: 102, message: 'en controller: Contraseña incorrecta' });
             }
 
             // Generacion de Token
@@ -55,7 +52,7 @@ class Login {
                 id: user.id_usuarios,
                 usuario: user.usuario,
                 email: user.email,
-                role: user.rol
+                rol: user.rol
             });
 
             res.json({ success: true, message: 'en controller: Inicio de sesión exitoso', token });

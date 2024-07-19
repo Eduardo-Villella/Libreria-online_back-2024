@@ -12,7 +12,7 @@ function checkRol(requireRol) {// Al llamar la funcion en las rutas debemos darl
 }
 
 
-module.exports = checkRole;
+module.exports = checkRol;
 
 
 /* El siguiente metodo cumple la misma funcion que la anterior */
