@@ -21,7 +21,7 @@ class RestApiServer {
 
     routes() {
         this.server.use('/api/books', require('./routes/book.routes'));
-        this.server.use('/api', require('./routes/front.static.routes'));//Agregada para get /config en front.static
+        this.server.use('/api', require('./routes/front.static.routes'));//Agregada para obtener /config desde front.static.routes.js en fronteend get
         this.server.use('/api/users', require('./routes/user.routes'));//Agregada para usuarios
         this.server.use('/api/categories', require('./routes/category.routes'));
         //Agregar aqui otras rutas

@@ -19,8 +19,8 @@ class Validator {
             provincia: Joi.string().max(100).optional(),
             pais: Joi.string().max(45).optional(),
             codigo_postal: Joi.string().max(45).optional(),
-            rol: Joi.string().valid('administrador', 'cliente').default('cliente'),
-            estado: Joi.string().valid('activo', 'inactivo').default('activo'),
+            rol: Joi.string().valid('Administrador', 'Cliente').default('Cliente'),
+            status: Joi.string().valid('activo', 'inactivo').default('activo'),
             imagen_perfil: Joi.binary().optional().allow(null)
         });
 

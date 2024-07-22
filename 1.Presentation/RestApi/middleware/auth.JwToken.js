@@ -9,7 +9,8 @@ const generateToken = (user) => {
         usuario: user.usuario,
         email: user.email,
         password: user.password,
-        id_usuarios: user.id,
+        id: user.id,
+        rol: user.rol
     };
     return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
     

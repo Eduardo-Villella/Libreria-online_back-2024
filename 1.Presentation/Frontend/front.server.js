@@ -10,7 +10,7 @@ class FrontServer{
         this.port = process.env.FRONTEND_PORT || 8080;// FRONTEND_PORT reperesenta el puerto del cliente -server frontend- en archivo .env // Se redunda agregando 8080 que es lo mismo que la variable de entorno
 
         this.basePath = path.join(__dirname, process.env.FRONTEND_PATH);// Se modifica para usar variables del entorno
-                console.log(`Base path desde front.server: ${this.basePath}`); // Para ver en que direccion esta buscando la ruta cargada en .env
+                console.log(`Base path desde front.server: ${this.basePath}`); // Borrar Para ver en que direccion esta buscando la ruta cargada en .env
 
         this.middlewares(); // Inicializa middlewares
         this.routes();// Inicializa las rutas

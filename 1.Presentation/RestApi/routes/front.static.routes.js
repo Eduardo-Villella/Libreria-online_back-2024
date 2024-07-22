@@ -28,6 +28,10 @@ router.get('/registro.html', (req, res) => {
     res.sendFile(path.join(basePath, 'registro.html'));
 });
 
+router.get('/perfil.html', (req, res) => {
+    res.sendFile(path.join(basePath, 'perfil.html'));
+});
+
 router.get('/login.html', (req, res) => {
     res.sendFile(path.join(basePath, 'login.html'));
 });

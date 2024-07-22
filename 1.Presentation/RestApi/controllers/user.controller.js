@@ -26,7 +26,7 @@ class UsersController {
 
     async getById(req = request, res = response) {
         try {
-            const id = req.params.id;
+            const id = req.params.id || req.user.id;// Alternativa si no funciona cambiar por: || req.user?.id|| req.user?.id_usuarios; recibe id de user.id del token generado
             if (!id || isNaN(id)) {// Valida que el ID es un numero
                 return res.status(400).json({ message: 'en controller getById: ID de usuario no válido', error: error.message });
             }
@@ -34,7 +34,7 @@ class UsersController {
             if (!result) {
                 return res.status(404).json({ message: 'en controller getById: Usuario no encontrado', error: error.message });
             }
-            res.json({ result });
+            res.json( result );
 
         } catch (error) {
             if (!res.headersSent) { // Verifica si los encabezados ya fueron enviados
@@ -134,10 +134,9 @@ class UsersController {
                         console.log('en controller, create: Usuario registrado correctamente:', result);// borrar
 
                         const token = generateToken({// Generamos token
-                            id: result.insertId,// Usamos result.insertId en lugar de id_usuarios porque es una respuesta de mysql al generar unnuevo id
+                            id: result.insertId,// Usamos result.insertId en lugar de id_usuarios porque es una respuesta de mysql al generar un nuevo id
                             usuario: userEntity.usuario,
-                            email: userEntity.email,
-                            rol: 'Cliente'
+                            email: userEntity.email
                         });
 
                         res.json({ success: true, message: 'en controller, create: Usuario registrado exitosamente', result, userEntity, token });// Enviamos la respuesta de exito
