@@ -19,13 +19,13 @@ const generateToken = (user) => {
 const verifyToken = (req, res, next) => {
     const authHeader = req.header('Authorization');
     if (!authHeader) {
-        return res.status(401).json({ message: 'Acceso denegado. Token no proporcionado.' });
+        return res.status(401).json({ message: 'en auth.JwToken 1: Acceso denegado. Token no proporcionado.' });
     }
 
     const token = authHeader.split(' ')[1];// Obtener el token sin el prefijo "Bearer"
 
     if (!token) {
-        return res.status(401).json({ message: 'Acceso denegado. Token no proporcionado.' });
+        return res.status(401).json({ message: 'en auth.JwToken 2: Acceso denegado. Token no proporcionado.' });
     }
 
     try {
@@ -35,7 +35,8 @@ const verifyToken = (req, res, next) => {
         next();
         
     } catch (error) {
-        res.status(401).json({ message: 'Token inválido' });
+        console.error('Error de verificación del token:', error); // borrar
+        res.status(401).json({ message: 'en auth.JwToken 3: Token inválido' });
     }
 
 };

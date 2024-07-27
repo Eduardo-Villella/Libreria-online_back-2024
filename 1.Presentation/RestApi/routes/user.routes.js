@@ -14,26 +14,26 @@ const login = new Login();
 /* --------------------- Rutas generales ----------------------------- */
 router.post('/register', usersController.createUser.bind(usersController));// Registro de usuario
 router.post('/login', login.login.bind(login));// Inicio de sesion usuario
-
 router.get('/perfil', verifyToken, usersController.getById.bind(usersController));// Verifica token y busca el usuario por id y tare todo el usuario
 
 /* --------------------- Rutas Clientes ----------------------------- */
 
-router.put('/customer/update', verifyToken,(req, res, next) => { usersController.updateUser(req, res); })// Actualizacion de datos del usuario unicamente propios
-
-//router.get('/:id', usersController.getById.bind(usersController));
-//router.get('/',usersController.getAll.bind(usersController));// Trae todos los usuarios
-//router.delete('/:id', usersController.deleteUser.bind(usersController));
+router.put('/customer/update', verifyToken,(req, res, next) => { usersController.updateUser(req, res); });// Actualizacion de datos del usuario unicamente propios
+router.put('/customer/:id', verifyToken, checkRol('Administrador'), (req, res, next) => { usersController.softDeleteUser(req, res); });// Borrado logico de usuario (actualizacion de datos put)
 
 /* --------------------- Rutas Administradores ----------------------------- */
 
-router.put('/admin/update', verifyToken, checkRol('Administrador'), (req, res, next) => { usersController.updateUser(req, res); })// Actualizacion de datos propios y de clientes
+router.get('/admin', verifyToken, checkRol('Administrador'), (req, res, next) => { usersController.getAll(req, res); });// Obtener todos los usuarios
+router.get('/admin/:id', verifyToken, checkRol('Administrador'), (req, res, next) => { usersController.getById(req, res); });// Obtener un usuario por ID
+router.get('/admin/:email', verifyToken, checkRol('Administrador'), (req, res, next) => { usersController.findByEmail(req, res); });// Obtener un usuario por email
+router.post('/admin/search', verifyToken, checkRol('Administrador'), (req, res) => { usersController.criteria(req, res); });// Busqueda de criterios multiples recomendable post en lugar de get
 
-//router.get('/admi', verifyToken, usersController.getAll.bind(usersController));// Obtener todos los usuarios
-//router.get('/admi/:id', verifyToken, usersController.getById.bind(usersController));// Obtener un usuario por ID
-//router.get('/admi/email/:email', verifyToken, usersController.isEmailRegistered.bind(usersController));// Verificar si un email está registrado // Manejar de otra forma
-//router.post('/admi/verifyCredentials', verifyToken, usersController.verifyCredentials.bind(usersController));// Verificar credenciales de un usuario // Manejar de otra forma
-//router.delete('/admi/:id', verifyToken, usersController.deleteUser.bind(usersController));// Eliminar un usuario por ID
+router.post('/admin', verifyToken, checkRol('Administrador'), (req, res, next) => { usersController.createUser(req, res); });// Crear nuevo usuario
+
+router.put('/admin', verifyToken, checkRol('Administrador'), (req, res, next) => { usersController.updateUser(req, res); });// Actualizacion de datos propios y de clientes
+
+router.put('/admin/:id', verifyToken, checkRol('Administrador'), (req, res, next) => { usersController.softDeleteUser(req, res); });// Borrado logico de usuario (actualizacion de datos put)
+router.delete('/admin/:id', verifyToken, checkRol('Administrador'), (req, res, next) => { usersController.deleteUser(req, res); });// Elimina totalmente un usuario
 
 
 module.exports = router;

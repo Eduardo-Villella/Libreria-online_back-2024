@@ -64,3 +64,21 @@ async function hashing() {
 
 hashing();
 
+// Otro script para hashear una contraseña y agregarla por linea de comando
+/*
+const bcrypt = require('bcrypt');
+
+const password = 'administradorDEprueba'; // La contraseña en texto plano
+const saltRounds = 10; // Número de rondas de sal
+
+bcrypt.hash(password, saltRounds, function(err, hash) {
+    if (err) {
+        console.error(err);
+    } else {
+        console.log(`Contraseña hasheada: ${hash}`);
+        // Copia el hash generado y actualiza la base de datos
+    }
+});
+*/
+// Luego desde consola ejecutar una linea mysql, como el siguiente ejemplo:
+/* mysql>UPDATE usuarios SET password = 'hash_generado' WHERE email = 'administrador@admin.ad'; */

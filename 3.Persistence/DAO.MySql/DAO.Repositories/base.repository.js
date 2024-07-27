@@ -78,7 +78,7 @@ class BaseRepository{ // Creamos clase general para realizar metodos CRUD
             const sql = `INSERT INTO ${this.tableName} (${[...this.fields]}) VALUES (${[...this.values.map(value => `"${value}"`)]})`; // Determina la tabla, los campos y sus valores                                                            
             console.log('en repository, add: Valores extraídos:', this.values); // borrar Log para los valores extraídos
             const result = await this.query(sql, this.values); // Ejecuta la consulta con los valores extraídos
-            console.log('en repository, add: Resultado de la inserción:', result); // borrar Log para el resultado de la inserción
+            console.log('en base repository, add: Resultado de la inserción:', result); // borrar Log para el resultado de la inserción
             return result;
         } catch (error) {
             console.error('en base repository add: Error al tratar de insertar en DB:', error);

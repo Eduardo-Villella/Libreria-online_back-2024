@@ -33,7 +33,7 @@ class Login {
             if (email === 'el.administrador@soy.yo' && password === 'LosAccidentesN0existen') {
                 const token = generateToken({
                     email: email,
-                    rol: 'SuperAdmin'
+                    rol: 'Administrador'
                 });
                 return res.json({ success: true, message: 'en login controller: Inicio de sesión como SuperAdmin exitoso', token, isAdmin: true });
             }

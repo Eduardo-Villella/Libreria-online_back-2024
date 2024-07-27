@@ -67,7 +67,7 @@ class UserModel {
         try {
             validator.validateUser(userEntity);
             const result = await this.repository.add(userEntity);
-            console.log('en model, create: Resultado de add:', result); // borrar
+            console.log('en user.model, create: Resultado de add:', result); // borrar
             return result;
         } catch (error) {
             console.error('en user.model: Error en create:', error);
