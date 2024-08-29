@@ -19,9 +19,9 @@ class Validator {
             provincia: Joi.string().max(100).optional(),
             pais: Joi.string().max(45).optional(),
             codigo_postal: Joi.string().max(45).optional(),
-            rol: Joi.string().valid('Administrador', 'Cliente').default('Cliente'),
-            status: Joi.string().valid('activo', 'inactivo').default('activo'),
-            imagen_perfil: Joi.binary().optional().allow(null)
+            rol: Joi.string().valid('Administrador', 'Cliente').when('$isUpdate', { is: true, then: Joi.optional(), otherwise: Joi.string().default('Cliente')}),
+            status: Joi.string().valid('activo', 'inactivo').when('$isUpdate', { is: true, then: Joi.optional(), otherwise: Joi.string().default('activo') }),
+            imagen_link: Joi.string().optional().allow(null),
         });
 
         this.categorySchema = Joi.object({
@@ -51,12 +51,46 @@ class Validator {
         });
     }
 
-    validateUser(user) {
-        const { error } = this.userSchema.validate(user);
+    // FIN SHEMAS - SIGUEN VALIDADORES //
+
+ /* ---------------------------------------------------------------------------------------- */
+
+    // Filtra el objeto de usuario para incluir solo los campos definidos en el esquema
+    filterUserFields(userEntity) {
+        const filteredUser = {};
+        for (const key in userEntity) {
+            if (this.userSchema.describe().keys[key]) {
+                filteredUser[key] = userEntity[key];
+            }
+        }
+        return filteredUser;
+    }
+
+    validateUser(userEntity, isUpdate = false) {
+        const schemaContext = { isUpdate };
+    
+        const filteredUser = this.filterUserFields(userEntity);
+        const { error, value } = this.userSchema.validate(filteredUser, {
+            stripUnknown: true,
+            context: schemaContext // Pasa el contexto para la validacion
+        });
+    
         if (error) {
             throw new Error(`en validator.js: Dato usuario invalido: ${error.message}`);
         }
-    }
+    
+        Object.keys(userEntity).forEach(key => {
+            if (!(key in value)) {
+                delete userEntity[key];
+            }
+        });
+    
+        Object.assign(userEntity, value);
+    
+        return userEntity;
+    }  
+
+/* ---------------------------------------------------------------------------------------- */
 
     validateCategory(category) {
         const { error } = this.categorySchema.validate(category);
@@ -65,12 +99,16 @@ class Validator {
         }
     }
 
+/* ---------------------------------------------------------------------------------------- */
+
     validateBook(book) {
         const { error } = this.bookSchema.validate(book);
         if (error) {
             throw new Error(`en validator.js: Dato libro invalido: ${error.message}`);
         }
     }
+
+/* ---------------------------------------------------------------------------------------- */
 
     validateCart(cart) {
         const { error } = this.cartSchema.validate(cart);
@@ -79,6 +117,7 @@ class Validator {
         }
     }
 
+/* ---------------------------------------------------------------------------------------- */
     validateCartDetail(cartDetail) {
         const { error } = this.cartDetailSchema.validate(cartDetail);
         if (error) {
@@ -91,3 +130,9 @@ class Validator {
 
 module.exports = new Validator();
 
+
+/*
+            originalFileName: Joi.string().optional().allow(null),
+            type: Joi.string().optional().allow(null),
+            id_usuarios: Joi.string().optional().allow(null), 
+*/

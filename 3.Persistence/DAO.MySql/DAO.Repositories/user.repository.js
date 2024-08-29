@@ -16,7 +16,7 @@ class UserRepository extends BaseRepository { //Se crea una clase para user que 
     }
 
     async verifyCredentials(email, password) {// Para verificar las credenciales del usuario. Sirve de filtro al devolver true o false
-        const sql = 'SELECT * FROM ${this.tableName} WHERE email = ? AND password = ?';
+        const sql = `SELECT * FROM ${this.tableName} WHERE email = ? AND password = ?`;
         const users = await this.query(sql, [email, password]);
         return users.length > 0 ? users[0] : null; // Devuelve el usuario si las credenciales son correctas
     }

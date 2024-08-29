@@ -1,4 +1,5 @@
-const path = require('path');
+/* Se anula porque se usara multer para trabajar con la carga de archivos desde el usuario*/
+/*const path = require('path');
 
 
 
@@ -28,3 +29,4 @@ async function upload(file){
 }
 
 module.exports = {upload};
+*/

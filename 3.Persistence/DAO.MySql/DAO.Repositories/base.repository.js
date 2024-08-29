@@ -32,7 +32,9 @@ class BaseRepository{ // Creamos clase general para realizar metodos CRUD
     }
 
     async findByCriteria(tableName, criteria, joins = []) {
+        console.log('en base.repository, findByCriteria called with:', { tableName, criteria, joins });//borrar
         let sql = `SELECT ${tableName}.*`;
+        console.log('en base.repository, Constructed SQL:', sql);//borrar
     
         for (const join of joins) {
             sql += `, ${join.table}.*`; // Selecciona todas las columnas de las tablas unidas
@@ -46,7 +48,8 @@ class BaseRepository{ // Creamos clase general para realizar metodos CRUD
     
         sql += ' WHERE 1=1';
         const params = [];
-    
+        console.log('en base.repository, Parameters for query:', params);//borrar
+        
         for (const [key, value] of Object.entries(criteria)) {
             if (value) {
                 if (typeof value === 'object' && value.operator && value.value) {
@@ -64,6 +67,7 @@ class BaseRepository{ // Creamos clase general para realizar metodos CRUD
     // Metodos de manipulacion de datos
 
     async extractData(entityObject){ 
+        console.log('Datos a actualizar:', entityObject); // borrar 
         this.fields = Object.keys(entityObject);
         this.values = Object.values(entityObject);
         /* Este metodo: extractData(entitytObject) extrae, interpreta y transforma los datos entre js y sql. Asigna a this.fields un array con los nombres de campos,

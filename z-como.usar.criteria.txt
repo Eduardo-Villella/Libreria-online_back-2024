@@ -1,0 +1,22 @@
+const criteria = {
+    password: 'tu_contraseña', // el valor de la contraseña que necesitas
+    rol: 'Administrador' // rol que deseas verificar
+};
+
+// Definiendo los joins
+const joins = [
+    {
+        table: 'otra_tabla',
+        type: 'INNER', // O 'LEFT', dependiendo de cómo quieras hacer la unión
+        on: 'usuarios.id = otra_tabla.usuario_id' // La condición de unión
+    }
+];
+
+const isAdminResponse = await fetch(`${usersEndpoint}/search/`, {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({ criteria, joins }) // Envío de criteria y joins
+});

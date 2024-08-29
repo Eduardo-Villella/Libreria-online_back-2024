@@ -16,7 +16,7 @@ class Login {
 
             // Validacion de entrada
             if (!email) {
-                return res.status(400).json({ message: 'en login controller: Email no proporcionado' });
+                return res.status(400).json({ message: 'en login controller:  Email no proporcionado' });
             }
             if (!password) {
                 return res.status(400).json({ message: 'en login controller: Contraseña no proporcionada' });
@@ -55,7 +55,14 @@ class Login {
                 rol: user.rol
             });
 
-            res.json({ success: true, message: 'en login controller: Inicio de sesión exitoso', token });
+            const rol = user.rol;
+            if (rol === "Administrador") {
+                res.json({ success: true, message: 'en login controller: Inicio de sesión como Administrador exitoso', token, isAdmin: true });
+
+            } else {
+                res.json({ success: true, message: 'en login controller: Inicio de sesión exitoso', token });
+
+            }
 
         } catch (error) {
             res.status(500).json({ success: false, message: 'en login controller: Error al iniciar sesión', error: error.message });
