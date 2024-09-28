@@ -67,7 +67,7 @@ class BaseRepository{ // Creamos clase general para realizar metodos CRUD
     // Metodos de manipulacion de datos
 
     async extractData(entityObject){ 
-        console.log('Datos a actualizar:', entityObject); // borrar 
+        console.log('en repository extractData, Datos a actualizar:', entityObject); // borrar 
         this.fields = Object.keys(entityObject);
         this.values = Object.values(entityObject);
         /* Este metodo: extractData(entitytObject) extrae, interpreta y transforma los datos entre js y sql. Asigna a this.fields un array con los nombres de campos,
@@ -76,25 +76,53 @@ class BaseRepository{ // Creamos clase general para realizar metodos CRUD
         Prefiero ponerlo aqui y no al final ya que sera usado por los dos proximos metodos: add y update, asi es mas facil su visualizacion y entendimiento */
     }
 
-    async add(entity) { // Para agregar un nuevo registro a la tabla
+    /*async add(entity) { // Para agregar un nuevo registro a la tabla
+                console.log('en baseRepostory, add, entidad recibida, entity: ', entity); // borrar Mostrar entidad recibida
         try {
             this.extractData(entity); // Extrae los datos del objeto entity
             const sql = `INSERT INTO ${this.tableName} (${[...this.fields]}) VALUES (${[...this.values.map(value => `"${value}"`)]})`; // Determina la tabla, los campos y sus valores                                                            
-            console.log('en repository, add: Valores extraídos:', this.values); // borrar Log para los valores extraídos
+                console.log('en repository, add: Valores extraídos:', this.values); // borrar Log para los valores extraídos
             const result = await this.query(sql, this.values); // Ejecuta la consulta con los valores extraídos
-            console.log('en base repository, add: Resultado de la inserción:', result); // borrar Log para el resultado de la inserción
+                console.log('en base repository, add: Resultado de la inserción:', result, sql); // borrar Log para el resultado de la inserción
             return result;
         } catch (error) {
             console.error('en base repository add: Error al tratar de insertar en DB:', error);
             throw error; // Re-lanza el error para que pueda ser capturado por quien lo llama
         }
-    }
+    }*/
 
+    async add(entity) { 
+        try {
+            console.log('en add, entidad recibida:', entity); // Mostrar entidad recibida
+            this.extractData(entity); 
+            console.log('en add, valores extraídos:', this.values); // Mostrar valores extraídos
+            
+            const fieldsString = this.fields.join(', ');
+            const placeholders = this.fields.map(() => '?').join(', ');
+            const sql = `INSERT INTO ${this.tableName} (${fieldsString}) VALUES (${placeholders})`;
+            
+            console.log('en add, SQL generada:', sql); // Mostrar la consulta SQL generada
+            console.log('en add, valores a insertar:', this.values); // Mostrar los valores que se van a insertar
+            
+            const result = await this.query(sql, this.values); 
+            console.log('en base repository, add: Resultado de la inserción:', result); // Log para el resultado de la inserción
+            
+            return result;
+        } catch (error) {
+            console.error('en base repository add: Error al tratar de insertar en DB:', error);
+            throw error; 
+        }
+    }
+    
     async update(entity, id){ // Actualiza un registro existente en la tabla //
+            console.log('en baseRepostory, update, entidad recibida, entity: ', entity); // borrar Mostrar entidad recibida
         this.extractData(entity); // Extrae los datos en dos array: this.fields y this.values (campo y valor)
-            const clouse = this.fields.map(field => `${field}=?`).join(', ');// Tomamos el array de campos: this.fields y map itera en cada elemento (transformandolo en un array clave=valor "${field}=?") y finalmente .join lo transforma en una cadena de texto entendible para sql
-            const sql = `UPDATE ${this.tableName} SET ${clouse} WHERE ${this.idField} = ?`;//Se define sql usando update y this.tableName que es libros y usando set para la cadena de texto que es clouse donde id es igual al ingresado en parametros
-            return await this.query(sql, [...this.values, id]);// Finalmente se une todo: const sql + operadr ... para expandir array + this.values +id y devuelve la actualizacion
+            console.log('en baseRepostory, update, valores extraídos, this.values:', this.values); // borrar Mostrar valores extraídos
+        const clouse = this.fields.map(field => `${field}=?`).join(', ');// Tomamos el array de campos: this.fields y map itera en cada elemento (transformandolo en un array clave=valor "${field}=?") y finalmente .join lo transforma en una cadena de texto entendible para sql
+        const sql = `UPDATE ${this.tableName} SET ${clouse} WHERE ${this.idField} = ?`;//Se define sql usando update y this.tableName que es libros y usando set para la cadena de texto que es clouse donde id es igual al ingresado en parametros
+            console.log('en baseRepostory, update, SQL generada:', sql); // borrar Mostrar la consulta SQL generada
+            console.log('en baseRepostory, update, valores a insertar array this.values, id:', [...this.values, id]); // borrar Mostrar los valores que se van a insertar
+        return await this.query(sql, [...this.values, id]);// Finalmente se une todo: const sql + operadr ... para expandir array + this.values +id y devuelve la actualizacion
     }
 
     async delete(id){// Elimina un registro por su ID

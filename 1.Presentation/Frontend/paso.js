@@ -1,0 +1,1 @@
+<input id="datepicker_2903303" name="choix_2903303" readonly="true" class="champTexte hasDatepicker" type="text" autocapitalize="off" autocorrect="off" required="required"></input>

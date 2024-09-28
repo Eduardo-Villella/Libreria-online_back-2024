@@ -1,6 +1,7 @@
 const { request, response } = require('express');
 const bcrypt = require('bcrypt');
 const path = require('path');
+const fs = require('fs'); // Importa file system
 
 const { UserModel } = require('../../../2.Domain/Models/index');
 const validator = require('../../helpers/Utils/validator');
@@ -70,16 +71,19 @@ class UsersController {
     async verifyCredentials(req =request, res = response) {
         try {
             const { email, password } = req.body; // Extrae email y contraseña del cuerpo de la solicitud
-            //console.log('en user.controller verifyCredentials email y password y tipos: ', email, typeof(email), password, typeof(password));//borrar
+            console.log('en user.controller verifyCredentials email y password y tipos: ', email, typeof(email), password, typeof(password));//borrar
             const user = await this.model.verifyCredentials(email, password);// Llama a la funcion del modelo para verificar credenciales
+            console.log('en user.controller verifyCredentials user: ',user);// borrar
 
             if (!user) {
-                console.log('en user.controller verifyCredentials UNO if !user tipo de respuesta: return res.status(200).json({ message: en user.controller, verifyCredentials: success: false, message: Email no encontrado o contraseña incorrecta })');//borrar
-                return res.status(200).json({ success: false, message: 'Email no encontrado o contraseña incorrecta' }); // Manejo de error si no se encuentra el usuario
+                const responseData = { success: false, message: 'Email no encontrado o contraseña incorrecta' };
+                console.log('en user.controller verifyCredentials UNO if (!user) tipo de respuesta: return res.status(200).json({ success: false, message: Email no encontrado o contraseña incorrecta })', responseData);//borrar
+                return res.status(200).json(responseData); // Manejo de error si no se encuentra el usuario
             }
 
-            console.log('en user.controller verifyCredentials DOS succes tipo de respuesta: return res.status(200).json({ success: true, user })');//borrar
-            return res.status(200).json({ success: true, user }); // Para el caso exitoso // Devuelve el usuario encontrado
+            const responseData = { success: true, user };
+            console.log('en user.controller verifyCredentials DOS succes tipo de respuesta: return res.status(200).json({ success: true, user })', responseData);//borrar
+            return res.status(200).json({ responseData }); // Para el caso exitoso // Devuelve el usuario encontrado
 
         } catch (error) {
             console.log('en user.controller verifyCredentials TRES catch tipo de respuesta: return res.status(500).json({message: en user.controller verifyCredentials: error enlas credenciales, error: error.message}) ');//borrar
@@ -137,23 +141,9 @@ class UsersController {
 
     async createUser(req = request, res = response) {
         try {
-            const {
-                usuario,
-                email,
-                password,
-                imagen_link,
-                nombre,
-                apellido,
-                fecha_nacimiento,
-                telefono,
-                direccion,
-                ciudad,
-                provincia,
-                pais,
-                codigo_postal,
-                rol,
-                status,
-            } = req.body;// Extraigo todos los campos del body
+            const userEntity = req.body;// Extraigo todos los campos del body
+            const { usuario, email, password } = userEntity; // Extraigo algunos campos de userEntity
+            console.log('en controller, create: userEntity y req.body: ', userEntity, req.body.usuario);// borrar
 
             if (!usuario || !email || !password) {// Valido que los campos requeridos esten
                 return res.status(400).json({ error: 'en controller, create: Debe proporcionar nombre de usuario, email y contraseña' });
@@ -170,53 +160,40 @@ class UsersController {
 
             const isRegistered = await this.model.findByEmail(email);// Verificacion del Email en la Base de Datos
             if (isRegistered) {
-                return res.json({ success: false, message: 'en controller, create: Email ya registrado' });
+                return res.status(409).json({ success: false, message: 'en controller, create: Email ya registrado' });
             }
-
-                const userEntity = Object.fromEntries(
-                    Object.entries({
-                        imagen_link,
-                        usuario,
-                        email,
-                        password,
-                        nombre,
-                        apellido,
-                        fecha_nacimiento,
-                        telefono,
-                        direccion,
-                        ciudad,
-                        provincia,
-                        pais,
-                        codigo_postal,
-                        rol,
-                        status,
-                    }).filter(([_, value]) => value !== "" && value !== undefined && value !== null)
-                );
 
                 const hashedPassword = await bcrypt.hash(password, 10); // Hashea la contraseña
                     console.log('en controller, create: Contraseña hasheada:', hashedPassword);// borrar
-
                 userEntity.password = hashedPassword;// Actualiza la entidad del usuario (userEntity) con la contraseña hasheada
                     console.log('en controller, create: Contenido de userEntity después de hashear la contraseña:', userEntity);// borrar
 
-                if (req.file) {
-                    // Comprueba si existe en DB, el nombre del archivo 
-                    const imagenPerfil = req.file.filename;
-                    const imagenPath = path.join('/users', imagenPerfil);
-                    const criteria = { imagen_link: imagenPath };
+                let createdFields = {};// Define createdFields como un objeto vacio
+                Object.assign(createdFields, userEntity);// Combinamos los campos de userEntity con createdFields
 
-                    const existingImage = await this.model.criteria(criteria);
-                    if (existingImage) {
-                        return res.status(409).json({success: false, message: 'El nombre de la imagen ya existe. ¿Desea cambiar el nombre, subir otra imagen o reemplazar la existente?', options: ['cambiar_nombre', 'subir_otra_imagen', 'reemplazar_existente']});
-                    }
-                    // Guarda el link de la imagen en la base de datos
-                    //const imagenPath = path.relative(path.join(__dirname, '../../../'), req.file.path);// Genera un path relativo
-                    userEntity.imagen_link = imagenPath;// Asigna la ruta de la imagen
+                // Manejo del archivo subido
+                if (req.file) {
+                    const file_name = req.fileName;// Toma el nombre de la imagen
+                    console.log("🚀 ~ UsersController ~ createUser ~ file_name:", file_name);// borrar
+                    const filePath = path.join(req.uploadPath, req.fileName);// Construye el filePath usando la información generada por Multer en req
+                    console.log('en controller , createUser, req.file: filePath, req.uploadPath, req.fileName: ', filePath, '||', req.uploadPath, '||',req.fileName);// borrar
+                    //const imagenPath = path.relative(path.join(__dirname, '../../../'), filePath);
+                    //console.log('en controller , createUser, req.file: imagenPath, filePath: ', imagenPath, filePath);// borrar
+                    createdFields.imagen_name = file_name;// Asigna la ruta de la imagen
+                    console.log("🚀 ~ UsersController ~ createUser ~ createdFields.imagen_name:", createdFields.imagen_name);// borrar
+                    
                 } else {
-                    userEntity.imagen_link = '/users/user-anonymous-100.png';
+                    createdFields.imagen_name = 'user-anonymous.png';// Asigna imagen por defecto
+                    console.log("🚀 ~ UsersController ~ createUser  ELSE ~ createdFields.imagen_name:", createdFields.imagen_name)
                 }
 
-                const result = await this.model.create(userEntity);// Agregamos el usuario utilizando el modelo
+                // Filtra campos undefined y crea el objeto actualizado
+                createdFields = Object.fromEntries(
+                    Object.entries(createdFields).filter(([key, value]) => value !== undefined && value !== 'undefined')
+                );
+                console.log('en controller, update: Campos actualizados:', createdFields); // borrar Verifica qué campos se están actualizando
+
+                const result = await this.model.create(createdFields);// Agregamos el usuario utilizando el modelo
                     console.log('en controller, create: Resultado de la creación:', result); //borrar
                 if (!result || !result.insertId) {// Lanzamos una excepcion error si el usuario no se registra correctamente
                         throw new Error('en controller, create: Error al tratar de registrar en base el usuario');
@@ -230,7 +207,7 @@ class UsersController {
                         email: userEntity.email
                     });
 
-                    res.json({ success: true, message: 'en controller, create: Usuario registrado exitosamente', result, userEntity, token });// Enviamos la respuesta de exito
+                    res.status(200).json({ success: true, message: 'en controller, create: Usuario registrado exitosamente', result, userEntity, token });// Enviamos la respuesta de exito
                         
         } catch (error) {// Atrapamos errores y los personalizamos segun el caso
                 let errorMessage;
@@ -268,27 +245,36 @@ class UsersController {
             }
 
             const userEntity = req.body;
+            console.log("🚀 ~ UsersController ~ updateUser ~ userEntity:", userEntity);// borrar
+            
+            let updatedFields = {};// Define updatedFields como un objeto vacio
+            Object.assign(updatedFields, userEntity);// Combinamos los campos de userEntity con updatedFields
+
+            // Si en Multer proceso un nuevo archivo, actualiza el campo imagen_name
+            if (req.file) {
+                const file_name = req.fileName;// Toma el nombre de la imagen
+                    console.log("🚀 ~ UsersController ~ updateUser ~ file_name:", file_name);// borrar
+                const filePath = path.join(req.uploadPath, req.fileName);// Construye el filePath usando la información generada por Multer en req
+                console.log("🚀 ~ UsersController ~ updateUser ~ filePath:", filePath);// borrar
+                
+                updatedFields.imagen_name = file_name; // Actualiza el campo con el nuevo link
+                console.log("🚀 ~ UsersController ~ updateUser ~ updatedFields.imagen_name:", updatedFields.imagen_name);// borrar
+            }
 
             // Filtra campos undefined y crea el objeto actualizado
-            const updatedFields = Object.fromEntries(
-                Object.entries(userEntity).filter(([key, value]) => value !== undefined)
+            updatedFields = Object.fromEntries(
+                Object.entries(updatedFields).filter(([key, value]) => value !== undefined && value !== 'undefined')
             );
             console.log('en controller, update: Campos actualizados:', updatedFields); // borrar Verifica qué campos se están actualizando
-
-            // Si Multer proceso un nuevo archivo, actualiza el campo imagen_link
-            if (req.file) {
-                const filePath = path.join(req.uploadPath, req.fileName);// Construye el filePath usando la información generada por Multer en req
-                
-                // Alternativa para generar el path relativo que se guarde en la base de datos (sin incluir la ruta absoluta)
-                const relativeFilePath = path.relative(path.join(__dirname, '../../../'), filePath);
-                
-                updatedFields.imagen_link = relativeFilePath; // Actualiza el campo con el nuevo link
-            }
 
             const result = await this.model.update(updatedFields, id);
             res.status(200).json({ success: true, result });
 
         } catch (error) {
+            // Verifica si el error es de validación
+            if (error.name === 'ValidationError') {
+                return res.status(422).json({ error: `Error de validación: ${error.message}` });
+            }
 
             res.status(500).json({ error: `en controller, update: Error al actualizar usuario: ${error.message}` });
         }
@@ -356,11 +342,37 @@ class UsersController {
     async deleteUser(req = request, res = response) {
         try {
             const id = req.params.id;
+            console.log('en controller delete, id de req.params.id: ', id);// borrar
+            // Busca y elimina primero el archivo guardado por el usuario en 4.Upload/users
+            const data = await this.model.getById(id);
+            console.log('en controller delete, user.id: ', data.id);// borrar
+            const user = data[0];
+            console.log("🚀 ~ UsersController ~ deleteUser ~ user:", user)// borrar
+            console.log('en controller delete, user: ', user);// borrar
+            if (!user) {
+                return res.status(404).json({ message: 'en controller delete: Usuario no encontrado' });
+            }
+            const imagenLink = user.imagen_name;// Obtenemos el nombre del archivo de imagen
+            console.log('en controller delete, de user.imagen_name: ', imagenLink);// borrar
+            if (imagenLink !== 'user-anonymous.png') {// Comprueba que no sea la imagen predeterminada para no borrarla
+                const basePath = process.cwd(); // Obtiene la ruta base del proyecto
+                console.log('en controller delete, en if (imagenLink !==user-anonymous, basePath: ', basePath);// borrar
+                const filePath = path.join(basePath, '/4.Upload/users/', imagenLink);// Completamos la ruta del archivo guardado en back
+                console.log('en controller delete, en if (imagenLink !==user-anonymous filePath: ', filePath);// borrar
+                fs.unlink(filePath, (err) => {// Elimina el archivo de imagen
+                    if (err && err.code !== 'ENOENT') {// Si el archivo no existe ENOENT lo ignora
+                        console.error('Error al eliminar la imagen:', err);
+                        return res.status(500).json({ message: 'Error al eliminar la imagen' });
+                    }
+                    console.log('Imagen eliminada correctamente');
+                });
+            };
+            // Borra los datos de la DB
             const result = await this.model.delete(id);
             res.json({ result, id });
 
         } catch (error) {
-            res.status(500).json({ message:'en controller, delete: ', error: error.message });
+            res.status(500).json({ message:'en controller, delete, catch: ', error: error.message });
         }
     }
 

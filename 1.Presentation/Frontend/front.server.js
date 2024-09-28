@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');// Se requiere para las direcciones de archivos y directorios
 require('dotenv').config();// Se requiere para usar variables de entorno
 
+
 const FrontStaticRoutes = require('../RestApi/routes/front.static.routes');
 
 class FrontServer{

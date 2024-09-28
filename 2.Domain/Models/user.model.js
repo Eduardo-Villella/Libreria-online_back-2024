@@ -11,6 +11,7 @@ class UserModel {
     async getById(id) {
         try {
             const result = await this.repository.findById(id);
+            console.log('en model en getById, result: ', result);
             return result;
 
         } catch (error) {
@@ -80,8 +81,9 @@ class UserModel {
     async create(userEntity) {// Comprobando
         try {
             validator.validateUser(userEntity);
+            console.log('en user.model, create: despues de validator userEntity:', userEntity); // borrar
             const result = await this.repository.add(userEntity);
-            console.log('en user.model, create: Resultado de add:', result); // borrar
+            console.log('en user.model, create: Result en repository.add:', result); // borrar
             return result;
 
         } catch (error) {
@@ -93,7 +95,9 @@ class UserModel {
     async update(userEntity, id) {
         try {
             validator.validateUser(userEntity, true); // 'true' indica que es una actualizacion parcial
+            console.log('en user.model, update: despues de validator userEntity:', userEntity); // borrar
             const result = await this.repository.update(userEntity, id);
+            console.log('en user.model, update: Result en repository.add:', result); // borrar
             return result;
 
         } catch (error) {
