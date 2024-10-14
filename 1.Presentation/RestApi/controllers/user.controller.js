@@ -204,7 +204,7 @@ class UsersController {
                     const token = generateToken({// Generamos token
                         id: result.insertId,// Usamos result.insertId en lugar de id_usuarios porque es una respuesta de mysql al generar un nuevo id
                         usuario: userEntity.usuario,
-                        email: userEntity.email
+                        email: userEntity.email,
                     });
 
                     res.status(200).json({ success: true, message: 'en controller, create: Usuario registrado exitosamente', result, userEntity, token });// Enviamos la respuesta de exito

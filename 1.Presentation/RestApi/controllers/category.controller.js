@@ -7,10 +7,9 @@ class CategoryController {
         this.model = new CategoryModel();
     }
 
-    // por el momento solo necesitamos estos dos metodos
     // Query functions
     async getAll(req = request, res = response){
-        const result = await this.model.getAll();
+        const result = await this.model.getAllCategories();// Controlar nombres de funciones
         res.json({
             result
         });
@@ -26,3 +25,4 @@ class CategoryController {
 }
 
 module.exports = CategoryController;
+

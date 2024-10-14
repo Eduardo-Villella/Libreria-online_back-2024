@@ -7,7 +7,7 @@ const mysql = require('mysql2/promise');
 
 const saltRounds = 10;
 
-/* -------------------- Configuración de conexión con DB --------------------- */
+/* -------------------- Configuracion de conexion con DB --------------------- */
 async function hashing() {
     const connection = await mysql.createConnection({
         host: process.env.DB_HOST,
@@ -25,8 +25,8 @@ async function hashing() {
     }
 
     async function update(id, updatedFields) {
-        if (id) { // Asegúrate de que id no sea null o undefined
-            const query = 'UPDATE usuarios SET ? WHERE id_usuarios = ?'; // Actualizado el nombre de la columna aquí
+        if (id) { // Asegura de que id no sea null o undefined
+            const query = 'UPDATE usuarios SET ? WHERE id_usuarios = ?'; // Actualizado el nombre de la columna aqui
             await connection.query(query, [updatedFields, id]);
         } else {
             console.log(`El ID del usuario es inválido: ${id}`);
@@ -35,7 +35,7 @@ async function hashing() {
 
     /* -------------------- Script para modificar contraseñas sin hash en DB -------------- */
 
-    // Función para verificar si la contraseña ya está hasheada
+    // Funcion para verificar si la contraseña ya está hasheada
     function isPasswordHashed(password) {
         return password && password.length === 60 && password.startsWith('$2b$'); // Verifica la longitud y formato del hash de bcrypt
     }
@@ -44,7 +44,7 @@ async function hashing() {
         const users = await getAll(); // Busca todos los registros
 
         for (const user of users) {
-            if (!isPasswordHashed(user.password)) { // Aplica la función isPasswordHashed que verifica si la contraseña ya está hasheada
+            if (!isPasswordHashed(user.password)) { // Aplica la funcion isPasswordHashed que verifica si la contraseña ya esta hasheada
                 const hashedPassword = await bcrypt.hash(user.password, saltRounds); // Hashea la contraseña
                 await update(user.id_usuarios, { password: hashedPassword }); // Guarda los datos
                 console.log(`Contraseña para el usuario ${user.id_usuarios} actualizada.`);
@@ -69,7 +69,7 @@ hashing();
 const bcrypt = require('bcrypt');
 
 const password = 'administradorDEprueba'; // La contraseña en texto plano
-const saltRounds = 10; // Número de rondas de sal
+const saltRounds = 10; // Numero de rondas de sal
 
 bcrypt.hash(password, saltRounds, function(err, hash) {
     if (err) {

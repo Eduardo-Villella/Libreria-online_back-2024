@@ -1,9 +1,9 @@
-/* En este archivo (no confundir con la biblioteca Validator.js) usaremos joi, biblioteca de validacion que permite definir esquemas 
+/* En este archivo (no confundir con la biblioteca Validator) usaremos joi, otra biblioteca de validacion que permite definir esquemas 
 usando la estructura de los campos de las tablas de la base de datos y luego validarlos contra objetos recibidos. 
 Se usa principalmente en controllers y/o models asegurando asi que los datos recibidos sean validados antes de llegar a la capa de repositories */
 
 const Joi = require('joi');
-const moment = require('moment');
+const moment = require('moment'); // Para las fechas
 require('moment/locale/es'); // Importa el idioma español
 
 moment.locale('es'); // Establece el idioma en español
@@ -92,7 +92,7 @@ class Validator {
         });
     
         if (error) {
-            throw error;//(`en validator.js: Dato usuario invalido: ${error.message}`);
+            throw error;
         }
 
         Object.keys(userEntity).forEach(key => {

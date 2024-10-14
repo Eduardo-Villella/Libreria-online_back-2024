@@ -6,9 +6,9 @@ class CategoryModel {
         this.repository = new CategoryRepository();
     }
 
-    async getAllCategories() {
+    async getAllCategories() {// Controlar nombres de funciones
         try {
-            return await this.repository.getAll();
+            return await this.repository.findAll();
         } catch (error) {
             throw new Error(`en category.model: Error al obtener todas las categorías: ${error.message}`);
         }

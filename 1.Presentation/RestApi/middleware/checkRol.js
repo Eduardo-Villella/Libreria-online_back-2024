@@ -5,7 +5,7 @@
                 next();// Pasa al siguiente middleware si el rol coincide
 
             } else {
-                res.status(403).json({ message: 'en checkRol: Acceso denegado: No tienes el rol adecuado' });
+                res.status(403).json({ message: 'en checkRol: Acceso denegado: No tienes permisos adecuados' });
             }
         };
 

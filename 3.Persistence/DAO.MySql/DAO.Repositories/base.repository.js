@@ -76,7 +76,7 @@ class BaseRepository{ // Creamos clase general para realizar metodos CRUD
         Prefiero ponerlo aqui y no al final ya que sera usado por los dos proximos metodos: add y update, asi es mas facil su visualizacion y entendimiento */
     }
 
-    /*async add(entity) { // Para agregar un nuevo registro a la tabla
+    /*async add(entity) { 
                 console.log('en baseRepostory, add, entidad recibida, entity: ', entity); // borrar Mostrar entidad recibida
         try {
             this.extractData(entity); // Extrae los datos del objeto entity
@@ -91,7 +91,7 @@ class BaseRepository{ // Creamos clase general para realizar metodos CRUD
         }
     }*/
 
-    async add(entity) { 
+    async add(entity) { // Para agregar un nuevo registro a la tabla
         try {
             console.log('en add, entidad recibida:', entity); // Mostrar entidad recibida
             this.extractData(entity); 

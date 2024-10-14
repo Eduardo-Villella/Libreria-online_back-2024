@@ -8,15 +8,25 @@ class BookRepository extends BaseRepository { //Se crea una clase para book que 
 
      /* -------------------------- Metodos específicos para BookRepository ------------------ */
 
-    /*async getAll() {
-        const sql = `SELECT libros.*, categoria.nombre_cat as categoria FROM ${this.tableName} LEFT JOIN categoria ON categoria.id_categoria = libros.categoria_id`;
+    async findAll(entityFields = null) {
+        const paramsFields = (!entityFields) ? '*' : Object.keys(entityFields).join(', ');
+        const sql = `
+            SELECT libros.*, categoria.nombre_cat 
+            FROM ${this.tableName} 
+            JOIN categoria ON libros.categoria_id = categoria.id_categoria
+        `;
         return await this.query(sql);
     }
 
     async findById(id) {
-        const sql = `SELECT libros.*, categoria.nombre_cat as categoria FROM ${this.tableName} LEFT JOIN categoria ON categoria.id_categoria = libros.categoria_id WHERE libros.id_libros = ?`;
+        const sql = `
+            SELECT libros.*, categoria.nombre_cat 
+            FROM ${this.tableName} 
+            JOIN categoria ON libros.categoria_id = categoria.id_categoria
+            WHERE libros.id_libros = ?
+        `;
         return await this.query(sql, [id]);
-    }*/
+    }
 
     //borra todo para abajo -------------------- borrar
     /*async delete(id){
@@ -31,6 +41,7 @@ class BookRepository extends BaseRepository { //Se crea una clase para book que 
         const sql = `UPDATE ${this.tableName} SET ${clouse} WHERE id_libros = ?`;
         return await this.query(sql, [...this.values, id]);
     }*/
+   
 }
 
 

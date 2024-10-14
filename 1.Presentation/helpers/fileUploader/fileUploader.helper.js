@@ -1,6 +1,6 @@
 /* Se anula porque se usara multer para trabajar con la carga de archivos desde el usuario*/
-/*const path = require('path');
-
+/*
+const path = require('path');
 
 
 const uploadPath = path.join(__dirname, '../../Frontend/', 'public', 'image');
